@@ -60,7 +60,17 @@
 // 返回有多少个section
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    int section = 0;
+
+    if (self.bigArray.count > 0) {
+        section++;
+    }
+    
+    if (self.leftArray.count > 0) {
+        section++;
+    }
+    
+    return section;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -72,8 +82,8 @@
             number = [self.bigArray count];
             break;
         case 1:
-            // 第二个，显示其余的表格
-            number = [self.leftArray count];
+            // 第二个，显示其余的表格，另加一个固定行
+            number = [self.leftArray count] + 1;
             break;
         default:
             break;
@@ -100,6 +110,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     BNRItem *item;
+    int count;
     
     // 使用这种方法，必须调用registerClass注册
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_ID forIndexPath:indexPath];
@@ -111,11 +122,19 @@
             break;
         case 1:
             // 其余的
-            item = self.leftArray[indexPath.row];
+            count = self.leftArray.count;
+            if (indexPath.row == count) {
+                // 最后一个固定行
+                cell.textLabel.text = @"No more items";
+                return cell;
+            } else {
+                item = self.leftArray[indexPath.row];
+            }
             break;
         default:
             break;
     }
+    
     cell.textLabel.text = [item description];
     
     return cell;
