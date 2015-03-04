@@ -12,6 +12,12 @@
 
 #define CELL_ID @"UITableViewCell"
 
+@interface BNRItemsViewController()
+
+@property (nonatomic, strong) NSMutableArray *bigArray;
+@property (nonatomic, strong) NSMutableArray *leftArray;
+@end
+
 @implementation BNRItemsViewController
 
 - (instancetype)init
@@ -22,6 +28,19 @@
             [[BNRItemStore sharedStore] createItem];
         }
     }
+    
+    // 初始化数组
+    self.bigArray = [NSMutableArray array];
+    self.leftArray = [NSMutableArray array];
+    
+    for (BNRItem *item in [[BNRItemStore sharedStore] allItems]) {
+        if (item.valueInDollars > 50) {
+            [self.bigArray addObject:item];
+        } else {
+            [self.leftArray addObject:item];
+        }
+    }
+
     return self;
 }
 
@@ -38,19 +57,67 @@
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID];
 }
 
+// 返回有多少个section
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 2;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[[BNRItemStore sharedStore] allItems] count];
+    int number = 0;
+    switch (section) {
+        case 0:
+            // 第一个，显示大于50美元的表格
+            number = [self.bigArray count];
+            break;
+        case 1:
+            // 第二个，显示其余的表格
+            number = [self.leftArray count];
+            break;
+        default:
+            break;
+    }
+    return number;
+}
+
+- (NSString*)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    NSString *title;
+    switch (section) {
+        case 0:
+            title = @"大于50美元";
+            break;
+        case 1:
+            title = @"其余";
+       default:
+            break;
+    }
+
+    return title;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    BNRItem *item;
+    
     // 使用这种方法，必须调用registerClass注册
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_ID forIndexPath:indexPath];
-    NSArray *items = [[BNRItemStore sharedStore] allItems];
-    BNRItem *item = items[indexPath.row];
     
+    switch (indexPath.section) {
+        case 0:
+            // 大于50美元
+            item = self.bigArray[indexPath.row];
+            break;
+        case 1:
+            // 其余的
+            item = self.leftArray[indexPath.row];
+            break;
+        default:
+            break;
+    }
     cell.textLabel.text = [item description];
+    
     return cell;
 }
 
