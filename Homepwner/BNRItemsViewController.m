@@ -27,6 +27,11 @@
             [[BNRItemStore sharedStore] createItem];
         }
     }
+    
+    // 设置背景图片
+    UIImage *image = [UIImage imageNamed:@"logo.png"];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+    self.tableView.backgroundView = imageView;
 
     // 初始化数组
     self.bigArray = [NSMutableArray array];
@@ -117,7 +122,7 @@
     
     NSLog(@"indexFlag2 = %d, %d", indexPath.section, indexPath.row);
 
-    return 80;
+    return 60;
 }
 
 
@@ -180,6 +185,7 @@
             cellText = @"Unknown cell text";
             break;
     }
+    cell.backgroundColor = [UIColor clearColor];
     cell.textLabel.text = cellText;
     return cell;
 }
