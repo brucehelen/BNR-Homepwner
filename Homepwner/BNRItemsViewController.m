@@ -90,6 +90,7 @@
     BNRItem *item = items[indexPath.row];
     
     cell.textLabel.text = [item description];
+    
     return cell;
 }
 
@@ -102,7 +103,15 @@
         [[BNRItemStore sharedStore] removeItem:item];
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        
+        
     }
+}
+
+// 修改删除按钮显示的文字
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return @"Remove";
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
