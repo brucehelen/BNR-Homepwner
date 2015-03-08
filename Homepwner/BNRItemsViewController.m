@@ -77,34 +77,44 @@
     }
 }
 
+// 显示多少行数据
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[[BNRItemStore sharedStore] allItems] count];
+    return [[[BNRItemStore sharedStore] allItems] count] + 1;
 }
 
+// 每行显示的cell
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // 使用这种方法，必须调用registerClass注册
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_ID forIndexPath:indexPath];
-    NSArray *items = [[BNRItemStore sharedStore] allItems];
-    BNRItem *item = items[indexPath.row];
     
-    cell.textLabel.text = [item description];
+    // 显示正常的数据行
+    if (indexPath.row < [[[BNRItemStore sharedStore] allItems] count]) {
+        NSArray *items = [[BNRItemStore sharedStore] allItems];
+        BNRItem *item = items[indexPath.row];
+        
+        cell.textLabel.text = [item description];
+    } else {
+        // row == count
+        cell.textLabel.text = @"No more items!";
+    }
+    
+    cell.showsReorderControl = YES;
     
     return cell;
 }
 
-// 删除行
+
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    NSLog(@"commitEditingStyle");
+    if (editingStyle == UITableViewCellEditingStyleDelete) {    // 删除行
         NSArray *items = [[BNRItemStore sharedStore] allItems];
         BNRItem *item = items[indexPath.row];
         [[BNRItemStore sharedStore] removeItem:item];
         
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-        
-        
     }
 }
 
@@ -114,11 +124,50 @@
     return @"Remove";
 }
 
+
+// 移动行
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
 {
     [[BNRItemStore sharedStore] moveItemAtIndex:sourceIndexPath.row
                                         toIndex:destinationIndexPath.row];
 }
 
+// 设置最后一行不能被编辑
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == [[[BNRItemStore sharedStore] allItems] count]) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+// 如果不实现，默认为：UITableViewCellEditingStyleDelete
+//- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    //return UITableViewCellEditingStyleNone;
+//    return UITableViewCellEditingStyleInsert;
+//}
+
+//- (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    return NO;
+//}
+
+
+// 设置行移动的范围：不能移动到最后一行（No more items!）的下面
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath
+{
+    NSIndexPath *indexPath;
+    NSUInteger count = [[[BNRItemStore sharedStore] allItems] count] - 1;
+    if (proposedDestinationIndexPath.row >= count) {
+        indexPath = [NSIndexPath indexPathForRow:count inSection:0];
+    } else {
+        indexPath = [NSIndexPath indexPathForRow:proposedDestinationIndexPath.row
+                                       inSection:proposedDestinationIndexPath.section];
+    }
+    
+    return indexPath;
+}
 
 @end
