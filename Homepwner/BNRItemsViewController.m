@@ -9,7 +9,7 @@
 #import "BNRItemsViewController.h"
 #import "BNRItem.h"
 #import "BNRItemStore.h"
-
+#import "BNRDetailViewController.h"
 #define CELL_ID @"UITableViewCell"
 
 @interface BNRItemsViewController()
@@ -169,5 +169,16 @@
     
     return indexPath;
 }
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] init];
+    
+    [self.navigationController pushViewController:detailViewController animated:YES];
+}
+
+
+
+
 
 @end
