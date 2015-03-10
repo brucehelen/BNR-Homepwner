@@ -14,6 +14,8 @@
 @property (weak, nonatomic) IBOutlet UITextField *serialNumberField;
 @property (weak, nonatomic) IBOutlet UITextField *valueField;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
+- (IBAction)ChangeDate:(UIButton *)sender;
+
 @end
 
 @implementation BNRDetailViewController
@@ -60,5 +62,14 @@
     self.navigationItem.title = _item.itemName;
 }
 
+// 触摸view空白，收回键盘
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    [self.view endEditing:YES];
+}
 
+- (IBAction)ChangeDate:(UIButton *)sender
+{
+    
+}
 @end
