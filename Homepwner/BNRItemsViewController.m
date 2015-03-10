@@ -13,7 +13,7 @@
 #define CELL_ID @"UITableViewCell"
 
 @interface BNRItemsViewController()
-@property (nonatomic, strong) IBOutlet UIView *headerView;
+//@property (nonatomic, strong) IBOutlet UIView *headerView;
 @end
 
 @implementation BNRItemsViewController
@@ -22,9 +22,17 @@
 {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
-        for (int i = 0; i < 5; i++) {
-            [[BNRItemStore sharedStore] createItem];
-        }
+//        for (int i = 0; i < 5; i++) {
+//            [[BNRItemStore sharedStore] createItem];
+//        }
+        
+        self.navigationItem.title = @"Homepwner";
+        
+        UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                                                             target:self
+                                                                             action:@selector(addNewItem:)];
+        self.navigationItem.rightBarButtonItem = bbi;
+        self.navigationItem.leftBarButtonItem = self.editButtonItem;
     }
     return self;
 }
@@ -42,18 +50,18 @@
     // 创建cell的过程交由系统管理--告诉视图，如果对象池中没有UITableViewCell对象，应该初始化哪种类型的UITableViewCell对象
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID];
     
-    self.tableView.tableHeaderView = self.headerView;
+    //self.tableView.tableHeaderView = self.headerView;
 }
 
-- (UIView *)headerView
-{
-    if (!_headerView) {
-        [[NSBundle mainBundle] loadNibNamed:@"HeaderView"
-                                      owner:self
-                                    options:nil];
-    }
-    return _headerView;
-}
+//- (UIView *)headerView
+//{
+//    if (!_headerView) {
+//        [[NSBundle mainBundle] loadNibNamed:@"HeaderView"
+//                                      owner:self
+//                                    options:nil];
+//    }
+//    return _headerView;
+//}
 
 - (IBAction)addNewItem:(id)sender
 {
@@ -66,16 +74,19 @@
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
 }
 
-- (IBAction)toggleEditingMode:(id)sender
-{
-    if (self.isEditing) {
-        [sender setTitle:@"Edit" forState:UIControlStateNormal];
-        [self setEditing:NO animated:YES];
-    } else {
-        [sender setTitle:@"Done" forState:UIControlStateNormal];
-        [self setEditing:YES animated:YES];
-    }
-}
+// 使用UINavigationBar对象后就不需要HeaderView.xib文件了。
+//// 进入编辑状态
+//- (IBAction)toggleEditingMode:(id)sender
+//{
+//    NSLog(@"toggleEditingMode");
+//    if (self.isEditing) {
+//        [sender setTitle:@"Edit" forState:UIControlStateNormal];
+//        [self setEditing:NO animated:YES];
+//    } else {
+//        [sender setTitle:@"Done" forState:UIControlStateNormal];
+//        [self setEditing:YES animated:YES];
+//    }
+//}
 
 // 显示多少行数据
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -170,14 +181,25 @@
     return indexPath;
 }
 
+// 选中某一行
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (indexPath.row >= [[[BNRItemStore sharedStore] allItems] count])
+        return;
+
     BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] init];
-    
+    NSArray *items = [[BNRItemStore sharedStore] allItems];
+    BNRItem *selectItem = items[indexPath.row];
+    detailViewController.item = selectItem;
     [self.navigationController pushViewController:detailViewController animated:YES];
 }
 
-
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [self.tableView reloadData];
+}
 
 
 
