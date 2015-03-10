@@ -181,7 +181,7 @@
     return indexPath;
 }
 
-// 选中某一行
+// 选中某一行，进行修改（进入另一个视图界面）
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // 选中最后一行：No more items!时不要进行操作
@@ -191,7 +191,9 @@
     BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] init];
     NSArray *items = [[BNRItemStore sharedStore] allItems];
     BNRItem *selectItem = items[indexPath.row];
+    NSLog(@"selectItem = %p", selectItem);
     detailViewController.item = selectItem;
+    NSLog(@"item = %p", detailViewController.item);
     [self.navigationController pushViewController:detailViewController animated:YES];
 }
 

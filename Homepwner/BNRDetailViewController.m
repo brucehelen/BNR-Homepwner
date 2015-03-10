@@ -8,6 +8,7 @@
 
 #import "BNRDetailViewController.h"
 #import "BNRItem.h"
+#import "BNRDateViewController.h"
 
 @interface BNRDetailViewController ()
 @property (weak, nonatomic) IBOutlet UITextField *nameField;
@@ -39,18 +40,20 @@
     if (!dateFormatter) {
         dateFormatter = [[NSDateFormatter alloc] init];
         dateFormatter.dateStyle = NSDateFormatterMediumStyle;
-        dateFormatter.timeStyle = NSDateFormatterNoStyle;
+        dateFormatter.timeStyle = NSDateFormatterShortStyle;
     }
+    NSLog(@"dateCreated: %@, %p", self.item.dateCreated, self.item.dateCreated);
     self.dateLabel.text = [dateFormatter stringFromDate:self.item.dateCreated];
 }
 
-// 视图将要消失时调用
+// 视图将要消失时调用，保存数据
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     
     [self.view endEditing:YES];
     BNRItem *item = self.item;
+    NSLog(@"viewWillDisappear item = %p", item);
     item.itemName = self.nameField.text;
     item.serialNumber = self.serialNumberField.text;
     item.valueInDollars = [self.valueField.text intValue];
@@ -58,11 +61,13 @@
 
 - (void)setItem:(BNRItem *)item
 {
+    NSLog(@"setItem = %p, %p", _item, item);
     _item = item;
+    NSLog(@"item = %p, %p", _item, item);
     self.navigationItem.title = _item.itemName;
 }
 
-// 触摸view空白，收回键盘
+// 触摸view空白处，收回键盘
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [self.view endEditing:YES];
@@ -70,6 +75,10 @@
 
 - (IBAction)ChangeDate:(UIButton *)sender
 {
-    
+    BNRDateViewController *dateViewController = [[BNRDateViewController alloc] init];
+    dateViewController.item = self.item;
+    [self.navigationController pushViewController:dateViewController animated:YES];
 }
+
+
 @end
