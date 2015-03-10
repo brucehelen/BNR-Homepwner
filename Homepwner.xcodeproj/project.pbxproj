@@ -13,8 +13,6 @@
 		1123673D1AA6A5BF00D0784D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1123673B1AA6A5BF00D0784D /* InfoPlist.strings */; };
 		1123673F1AA6A5BF00D0784D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1123673E1AA6A5BF00D0784D /* main.m */; };
 		112367431AA6A5BF00D0784D /* BNRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 112367421AA6A5BF00D0784D /* BNRAppDelegate.m */; };
-		112367461AA6A5BF00D0784D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 112367441AA6A5BF00D0784D /* Main.storyboard */; };
-		112367491AA6A5BF00D0784D /* BNRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 112367481AA6A5BF00D0784D /* BNRViewController.m */; };
 		1123674B1AA6A5BF00D0784D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1123674A1AA6A5BF00D0784D /* Images.xcassets */; };
 		112367521AA6A5BF00D0784D /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112367511AA6A5BF00D0784D /* XCTest.framework */; };
 		112367531AA6A5BF00D0784D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112367321AA6A5BF00D0784D /* Foundation.framework */; };
@@ -51,9 +49,6 @@
 		112367401AA6A5BF00D0784D /* Homepwner-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Homepwner-Prefix.pch"; sourceTree = "<group>"; };
 		112367411AA6A5BF00D0784D /* BNRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BNRAppDelegate.h; sourceTree = "<group>"; };
 		112367421AA6A5BF00D0784D /* BNRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BNRAppDelegate.m; sourceTree = "<group>"; };
-		112367451AA6A5BF00D0784D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		112367471AA6A5BF00D0784D /* BNRViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BNRViewController.h; sourceTree = "<group>"; };
-		112367481AA6A5BF00D0784D /* BNRViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BNRViewController.m; sourceTree = "<group>"; };
 		1123674A1AA6A5BF00D0784D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		112367501AA6A5BF00D0784D /* HomepwnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HomepwnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		112367511AA6A5BF00D0784D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -133,9 +128,6 @@
 			children = (
 				112367411AA6A5BF00D0784D /* BNRAppDelegate.h */,
 				112367421AA6A5BF00D0784D /* BNRAppDelegate.m */,
-				112367441AA6A5BF00D0784D /* Main.storyboard */,
-				112367471AA6A5BF00D0784D /* BNRViewController.h */,
-				112367481AA6A5BF00D0784D /* BNRViewController.m */,
 				112367671AA6AB9C00D0784D /* BNRItemsViewController.h */,
 				112367681AA6AB9C00D0784D /* BNRItemsViewController.m */,
 				3282BFAE1AAD23CF00205EF2 /* BNRDetailViewController.h */,
@@ -262,7 +254,6 @@
 			files = (
 				1123674B1AA6A5BF00D0784D /* Images.xcassets in Resources */,
 				1123673D1AA6A5BF00D0784D /* InfoPlist.strings in Resources */,
-				112367461AA6A5BF00D0784D /* Main.storyboard in Resources */,
 				3282BFB21AAD23CF00205EF2 /* BNRDetailViewController.xib in Resources */,
 				112375401AAEC419000D61DD /* BNRDateViewController.xib in Resources */,
 			);
@@ -289,7 +280,6 @@
 				1123676F1AA6AE9C00D0784D /* BNRItem.m in Sources */,
 				3282BFB11AAD23CF00205EF2 /* BNRDetailViewController.m in Sources */,
 				112367691AA6AB9C00D0784D /* BNRItemsViewController.m in Sources */,
-				112367491AA6A5BF00D0784D /* BNRViewController.m in Sources */,
 				112367721AA6B0F500D0784D /* BNRItemStore.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -319,14 +309,6 @@
 				1123673C1AA6A5BF00D0784D /* en */,
 			);
 			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		112367441AA6A5BF00D0784D /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				112367451AA6A5BF00D0784D /* Base */,
-			);
-			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 		1123675A1AA6A5BF00D0784D /* InfoPlist.strings */ = {
