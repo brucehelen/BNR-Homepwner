@@ -184,6 +184,7 @@
 // 选中某一行
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    // 选中最后一行：No more items!时不要进行操作
     if (indexPath.row >= [[[BNRItemStore sharedStore] allItems] count])
         return;
 

@@ -18,6 +18,14 @@
 
 @implementation BNRDetailViewController
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    // 设置数字键盘
+    self.valueField.keyboardType = UIKeyboardTypeNumberPad;
+}
+
 // 视图出现时调用
 - (void)viewWillAppear:(BOOL)animated
 {
