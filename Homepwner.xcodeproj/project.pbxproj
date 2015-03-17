@@ -129,6 +129,7 @@
 		112367381AA6A5BF00D0784D /* Homepwner */ = {
 			isa = PBXGroup;
 			children = (
+				113C2DCA1AB7C6B8005F9059 /* iPad */,
 				112367411AA6A5BF00D0784D /* BNRAppDelegate.h */,
 				112367421AA6A5BF00D0784D /* BNRAppDelegate.m */,
 				112367671AA6AB9C00D0784D /* BNRItemsViewController.h */,
@@ -178,6 +179,13 @@
 				1123675A1AA6A5BF00D0784D /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		113C2DCA1AB7C6B8005F9059 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = iPad;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -406,7 +414,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Homepwner/Homepwner-Prefix.pch";
 				INFOPLIST_FILE = "Homepwner/Homepwner-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -419,7 +429,9 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Homepwner/Homepwner-Prefix.pch";
 				INFOPLIST_FILE = "Homepwner/Homepwner-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
