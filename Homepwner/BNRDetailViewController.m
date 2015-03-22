@@ -33,6 +33,15 @@
     self.valueField.keyboardType = UIKeyboardTypeNumberPad;
 }
 
+//- (void)viewDidLayoutSubviews
+//{
+//    for (UIView *subview in self.view.subviews) {
+//        if ([subview hasAmbiguousLayout]) {
+//            NSLog(@"AMBIGUOUS: %@", subview);
+//        }
+//    }
+//}
+
 // 视图出现时调用
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -81,6 +90,12 @@
 - (IBAction)backgroundTapped:(id)sender
 {
     [self.view endEditing:YES];
+    
+//    for (UIView *view in self.view.subviews) {
+//        if ([view hasAmbiguousLayout]) {
+//            [view exerciseAmbiguityInLayout];
+//        }
+//    }
 }
 
 // 修改日期，弹出修改日期视图
