@@ -42,7 +42,11 @@
 {
     self = [super init];
     if (self) {
-        _privateItems = [[NSMutableArray alloc] init];
+        NSString *path = [self itemArchivePath];
+        _privateItems = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+        if (!_privateItems) {
+            _privateItems = [[NSMutableArray alloc] init];
+        }
     }
     return self;
 }
@@ -55,7 +59,8 @@
 
 - (BNRItem *)createItem
 {
-    BNRItem *item = [BNRItem randomItem];
+    //BNRItem *item = [BNRItem randomItem];
+    BNRItem *item = [[BNRItem alloc] init];
     [self.privateItems addObject:item];
     return item;
 }
@@ -79,5 +84,19 @@
     [self.privateItems insertObject:item atIndex:toIndex];
 }
 
+#pragma mark - 配置文件相关
+- (NSString *)itemArchivePath
+{
+    NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [documentDirectories firstObject];
+    return [documentDirectory stringByAppendingPathComponent:@"items.archive"];
+}
+
+- (BOOL)saveChanges
+{
+    NSString *path = [self itemArchivePath];
+    return [NSKeyedArchiver archiveRootObject:self.privateItems
+                                       toFile:path];
+}
 
 @end

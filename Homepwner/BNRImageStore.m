@@ -31,6 +31,12 @@
     self = [super init];
     if (self) {
         _dict = [[NSMutableDictionary alloc] init];
+        
+        NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+        [nc addObserver:self
+               selector:@selector(clearCaches:)
+                   name:UIApplicationDidReceiveMemoryWarningNotification
+                 object:nil];
     }
     
     return self;
@@ -39,11 +45,26 @@
 - (void)setImage:(UIImage *)image forKey:(NSString *)key
 {
     self.dict[key] = image;
+    
+    NSString *imagePath = [self imagePathForKey:key];
+    NSData *data = UIImageJPEGRepresentation(image, 0.5);
+    [data writeToFile:imagePath atomically:YES];
 }
 
 - (UIImage *)imageForKey:(NSString *)key
 {
-    return self.dict[key];
+    UIImage *result = self.dict[key];
+    if (!result) {
+        NSString *imagePath = [self imagePathForKey:key];
+        result = [UIImage imageWithContentsOfFile:imagePath];
+        if (result) {
+            self.dict[key] = result;
+        } else {
+            NSLog(@"Error: unable to find %@", [self imagePathForKey:key]);
+        }
+    }
+    
+    return result;
 }
 
 - (void)deleteImageForKey:(NSString *)key
@@ -53,7 +74,24 @@
     }
     
     [self.dict removeObjectForKey:key];
+
+    // 删除文件系统中保持的图片文件
+    NSString *imagePath = [self imagePathForKey:key];
+    [[NSFileManager defaultManager] removeItemAtPath:imagePath error:nil];
 }
 
+- (NSString *)imagePathForKey:(NSString *)key
+{
+    NSArray *documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [documentDirectories firstObject];
+
+    return [documentDirectory stringByAppendingPathComponent:key];
+}
+
+- (void)clearCaches:(NSNotification *)note
+{
+    NSLog(@"flushing %d images out of the cache", [self.dict count]);
+    [self.dict removeAllObjects];
+}
 
 @end
