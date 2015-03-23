@@ -13,7 +13,7 @@
 #define CELL_ID @"UITableViewCell"
 
 @interface BNRItemsViewController()
-//@property (nonatomic, strong) IBOutlet UIView *headerView;
+
 @end
 
 @implementation BNRItemsViewController
@@ -22,12 +22,7 @@
 {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
-//        for (int i = 0; i < 5; i++) {
-//            [[BNRItemStore sharedStore] createItem];
-//        }
-        
         self.navigationItem.title = @"Homepwner";
-        
         UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                                                              target:self
                                                                              action:@selector(addNewItem:)];
@@ -49,44 +44,34 @@
     
     // 创建cell的过程交由系统管理--告诉视图，如果对象池中没有UITableViewCell对象，应该初始化哪种类型的UITableViewCell对象
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID];
-    
-    //self.tableView.tableHeaderView = self.headerView;
 }
-
-//- (UIView *)headerView
-//{
-//    if (!_headerView) {
-//        [[NSBundle mainBundle] loadNibNamed:@"HeaderView"
-//                                      owner:self
-//                                    options:nil];
-//    }
-//    return _headerView;
-//}
 
 - (IBAction)addNewItem:(id)sender
 {
-    //NSInteger lastRow = [self.tableView numberOfRowsInSection:0];
-    //NSIndexPath *indexPath = [NSIndexPath indexPathForRow:lastRow inSection:0];
     BNRItem *newItem = [[BNRItemStore sharedStore] createItem];
-    NSInteger lastRow = [[[BNRItemStore sharedStore] allItems] indexOfObject:newItem];
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:lastRow inSection:0];
-    
-    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
-}
+//    NSInteger lastRow = [[[BNRItemStore sharedStore] allItems] indexOfObject:newItem];
+//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:lastRow inSection:0];
+//    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationTop];
+    BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] initForNewItem:YES];
+    detailViewController.item = newItem;
+    detailViewController.dismissBlock = ^{
+        [self.tableView reloadData];
+    };
 
-// 使用UINavigationBar对象后就不需要HeaderView.xib文件了。
-//// 进入编辑状态
-//- (IBAction)toggleEditingMode:(id)sender
-//{
-//    NSLog(@"toggleEditingMode");
-//    if (self.isEditing) {
-//        [sender setTitle:@"Edit" forState:UIControlStateNormal];
-//        [self setEditing:NO animated:YES];
-//    } else {
-//        [sender setTitle:@"Done" forState:UIControlStateNormal];
-//        [self setEditing:YES animated:YES];
-//    }
-//}
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:detailViewController];
+    // 显示一个模态的页面：在iPhone上全屏显示，在iPad上以模态对话框的形式显示
+    navController.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    // 第17章，深入学习：视图控制器之间的关系
+//    navController.modalPresentationStyle = UIModalPresentationCurrentContext;
+//    self.definesPresentationContext = YES;
+    
+    // 3D翻转效果
+    navController.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+    [self presentViewController:navController
+                       animated:YES
+                     completion:nil];
+}
 
 // 显示多少行数据
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -188,12 +173,10 @@
     if (indexPath.row >= [[[BNRItemStore sharedStore] allItems] count])
         return;
 
-    BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] init];
+    BNRDetailViewController *detailViewController = [[BNRDetailViewController alloc] initForNewItem:NO];
     NSArray *items = [[BNRItemStore sharedStore] allItems];
     BNRItem *selectItem = items[indexPath.row];
-    NSLog(@"selectItem = %p", selectItem);
     detailViewController.item = selectItem;
-    NSLog(@"item = %p", detailViewController.item);
     [self.navigationController pushViewController:detailViewController animated:YES];
 }
 
@@ -203,7 +186,5 @@
     
     [self.tableView reloadData];
 }
-
-
 
 @end

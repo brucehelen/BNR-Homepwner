@@ -10,20 +10,67 @@
 #import "BNRItem.h"
 #import "BNRDateViewController.h"
 #import "BNRImageStore.h"
+#import "BNRItemStore.h"
 
-@interface BNRDetailViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UITextFieldDelegate>
+@interface BNRDetailViewController () <UINavigationControllerDelegate, UIImagePickerControllerDelegate, UITextFieldDelegate, UIPopoverControllerDelegate>
+
 @property (weak, nonatomic) IBOutlet UITextField *nameField;
 @property (weak, nonatomic) IBOutlet UITextField *serialNumberField;
 @property (weak, nonatomic) IBOutlet UITextField *valueField;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
-- (IBAction)backgroundTapped:(id)sender;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *cameraButton;
+@property (weak, nonatomic) IBOutlet UIButton *changeDateButton;
+@property (strong, nonatomic) UIPopoverController *imagePickerPopover;
 
+- (IBAction)backgroundTapped:(id)sender;
 - (IBAction)ChangeDate:(UIButton *)sender;
+
 @end
 
 @implementation BNRDetailViewController
+
+#pragma mark - 实现新的初始化方法（模态）
+- (instancetype)initForNewItem:(BOOL)isNew
+{
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
+        if (isNew) {
+            UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                                                      target:self
+                                                                                      action:@selector(save:)];
+            self.navigationItem.rightBarButtonItem = doneItem;
+            UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                                                        target:self
+                                                                                        action:@selector(cancel:)];
+            self.navigationItem.leftBarButtonItem = cancelItem;
+        }
+    }
+    
+    return self;
+}
+
+- (void)save:(id)sender
+{
+    [self.presentingViewController dismissViewControllerAnimated:YES
+                                                      completion:self.dismissBlock];
+}
+
+- (void)cancel:(id)sender
+{
+    [[BNRItemStore sharedStore] removeItem:self.item];
+    [self.presentingViewController dismissViewControllerAnimated:YES
+                                                      completion:self.dismissBlock];
+}
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    @throw [NSException exceptionWithName:@"Wrong initialize"
+                                   reason:@"Use initForNewItem"
+                                 userInfo:nil];
+    return nil;
+}
 
 - (void)viewDidLoad
 {
@@ -33,7 +80,7 @@
     self.valueField.keyboardType = UIKeyboardTypeNumberPad;
     
     UIImageView *iv = [[UIImageView alloc] initWithImage:nil];
-    iv.contentMode = UIViewContentModeCenter;
+    iv.contentMode = UIViewContentModeScaleAspectFit;
     iv.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:iv];
     self.imageView = iv;
@@ -43,14 +90,14 @@
                                                     forAxis:UILayoutConstraintAxisVertical];
     
     NSDictionary *nameMap = @{@"imageView": self.imageView,
-                              @"dateLabel": self.dateLabel,
+                              @"changeDate": self.changeDateButton,
                               @"toolbar": self.toolbar};
     
     NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[imageView]-0-|"
                                                                              options:0
                                                                              metrics:nil
                                                                                views:nameMap];
-    NSArray *verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[dateLabel]-[imageView]-[toolbar]"
+    NSArray *verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[changeDate]-15-[imageView]-15-[toolbar]"
                                                                            options:0
                                                                            metrics:nil
                                                                              views:nameMap];
@@ -70,6 +117,11 @@
 // 视图出现时调用
 - (void)viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
+    
+    UIInterfaceOrientation io = [[UIApplication sharedApplication] statusBarOrientation];
+    [self prepareViewsForOrientation:io];
+    
     self.nameField.text = self.item.itemName;
     self.serialNumberField.text = self.item.serialNumber;
     self.valueField.text = [NSString stringWithFormat:@"%d", self.item.valueInDollars];
@@ -134,6 +186,13 @@
 #pragma mark - UIToolBar上面的相机拍照按钮
 - (IBAction)takePicture:(UIBarButtonItem *)sender
 {
+    if ([self.imagePickerPopover isPopoverVisible]) {
+        // 当前已经有一个UIImagePickerController对象显示在屏幕上，关闭并清空
+        [self.imagePickerPopover dismissPopoverAnimated:YES];
+        self.imagePickerPopover = nil;
+        return;
+    }
+
     UIImagePickerController *imagePicker = [[UIImagePickerController alloc] init];
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -142,8 +201,19 @@
     }
     imagePicker.delegate = self;
     imagePicker.allowsEditing = YES;
-    // 以模态的形式显示UIImagePickerController对象
-    [self presentViewController:imagePicker animated:YES completion:nil];
+    
+    // 在iPad上通过UIPopoverController显示视图
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        self.imagePickerPopover = [[UIPopoverController alloc] initWithContentViewController:imagePicker];
+        self.imagePickerPopover.delegate = self;
+        self.imagePickerPopover.popoverBackgroundViewClass = nil;
+        [self.imagePickerPopover presentPopoverFromBarButtonItem:sender
+                                        permittedArrowDirections:UIPopoverArrowDirectionAny
+                                                        animated:YES];
+    } else {
+        // 在iPhone上以模态的形式显示UIImagePickerController对象
+        [self presentViewController:imagePicker animated:YES completion:nil];
+    }
 }
 
 // 清除UIImageView上面显示的图片
@@ -159,11 +229,44 @@
     UIImage *image = info[UIImagePickerControllerOriginalImage];
     self.imageView.image = image;
     [[BNRImageStore sharedStore] setImage:image forKey:self.item.itemKey];
+    
     // 关闭UIImagePickerController对象
-    [self dismissViewControllerAnimated:YES completion:nil];
+    if (self.imagePickerPopover) {
+        // 关闭UIImagePickerController对象
+        [self.imagePickerPopover dismissPopoverAnimated:YES];
+        self.imagePickerPopover = nil;
+    } else {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
+#pragma mark - 自动转屏
+- (void)prepareViewsForOrientation:(UIInterfaceOrientation)orientation
+{
+    // iPad
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return;
+    }
+    
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+        self.imageView.hidden = YES;
+        self.cameraButton.enabled = NO;
+    } else {
+        self.imageView.hidden = NO;
+        self.cameraButton.enabled = YES;
+    }
+}
 
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+{
+    [self prepareViewsForOrientation:toInterfaceOrientation];
+}
 
+#pragma mark - UIPopoverController相关
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+    NSLog(@"User dismissed popover");
+    self.imagePickerPopover = nil;
+}
 
 @end
