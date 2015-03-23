@@ -47,7 +47,9 @@
     self.dict[key] = image;
     
     NSString *imagePath = [self imagePathForKey:key];
-    NSData *data = UIImageJPEGRepresentation(image, 0.5);
+//    NSData *data = UIImageJPEGRepresentation(image, 0.5);
+    // 第18章初级练习：使用PNG存储图片
+    NSData *data = UIImagePNGRepresentation(image);
     [data writeToFile:imagePath atomically:YES];
 }
 
