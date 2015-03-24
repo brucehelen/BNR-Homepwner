@@ -23,6 +23,9 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *cameraButton;
 @property (weak, nonatomic) IBOutlet UIButton *changeDateButton;
 @property (strong, nonatomic) UIPopoverController *imagePickerPopover;
+@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
+@property (weak, nonatomic) IBOutlet UILabel *serialNumberLabel;
+@property (weak, nonatomic) IBOutlet UILabel *valueLabel;
 
 - (IBAction)backgroundTapped:(id)sender;
 - (IBAction)ChangeDate:(UIButton *)sender;
@@ -46,9 +49,21 @@
                                                                                         action:@selector(cancel:)];
             self.navigationItem.leftBarButtonItem = cancelItem;
         }
+        
+        NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+        [defaultCenter addObserver:self
+                          selector:@selector(updateFonts)
+                              name:UIContentSizeCategoryDidChangeNotification
+                            object:nil];
     }
     
     return self;
+}
+
+- (void)dealloc
+{
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+    [defaultCenter removeObserver:self];
 }
 
 - (void)save:(id)sender
@@ -137,6 +152,9 @@
     NSString *itemKey = self.item.itemKey;
     UIImage *imageToDisplay = [[BNRImageStore sharedStore] imageForKey:itemKey];
     self.imageView.image = imageToDisplay;
+    
+    // 更新字体
+    [self updateFonts];
 }
 
 // 视图将要消失时调用，保存数据
@@ -270,6 +288,21 @@
 {
     NSLog(@"User dismissed popover");
     self.imagePickerPopover = nil;
+}
+
+#pragma mark - 动态字体
+- (void)updateFonts
+{
+    UIFont *font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    
+    self.nameLabel.font = font;
+    self.serialNumberLabel.font = font;
+    self.valueLabel.font = font;
+    self.dateLabel.font = font;
+    
+    self.nameField.font = font;
+    self.serialNumberField.font = font;
+    self.valueField.font = font;
 }
 
 @end

@@ -74,6 +74,8 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="imageViewHeightConstraint" destination="4MA-o5-kod" id="7TM-v6-zUd"/>
+                <outlet property="imageViewWidthConstraint" destination="kEC-W9-eq2" id="KKa-Pb-ITF"/>
                 <outlet property="nameLabel" destination="KVz-2l-KSE" id="Jng-Rc-Bro"/>
                 <outlet property="serialNumberLabel" destination="JXO-Dr-IiH" id="5Qp-xz-oze"/>
                 <outlet property="thumbnailView" destination="bu5-nN-Yiw" id="2ng-ol-3IL"/>
