@@ -10,10 +10,14 @@
 #import "BNRItem.h"
 #import "BNRItemStore.h"
 #import "BNRDetailViewController.h"
+#import "BNRItemCell.h"
+#import "BNRImageStore.h"
+#import "BNRImageViewController.h"
+
 #define CELL_ID @"UITableViewCell"
 
-@interface BNRItemsViewController()
-
+@interface BNRItemsViewController() <UIPopoverControllerDelegate>
+@property (nonatomic, strong) UIPopoverController *imagePopover;
 @end
 
 @implementation BNRItemsViewController
@@ -43,7 +47,9 @@
     [super viewDidLoad];
     
     // 创建cell的过程交由系统管理--告诉视图，如果对象池中没有UITableViewCell对象，应该初始化哪种类型的UITableViewCell对象
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID];
+    //[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:CELL_ID];
+    UINib *nib = [UINib nibWithNibName:@"BNRItemCell" bundle:nil];
+    [self.tableView registerNib:nib forCellReuseIdentifier:@"BNRItemCell"];
 }
 
 - (IBAction)addNewItem:(id)sender
@@ -76,29 +82,68 @@
 // 显示多少行数据
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [[[BNRItemStore sharedStore] allItems] count] + 1;
+    return [[[BNRItemStore sharedStore] allItems] count];
 }
 
 // 每行显示的cell
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     // 使用这种方法，必须调用registerClass注册
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_ID forIndexPath:indexPath];
+    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CELL_ID forIndexPath:indexPath];
     
+    BNRItemCell *cell = [tableView dequeueReusableCellWithIdentifier:@"BNRItemCell" forIndexPath:indexPath];
     // 显示正常的数据行
     if (indexPath.row < [[[BNRItemStore sharedStore] allItems] count]) {
         NSArray *items = [[BNRItemStore sharedStore] allItems];
         BNRItem *item = items[indexPath.row];
         
-        cell.textLabel.text = [item description];
-    } else {
-        // row == count
-        cell.textLabel.text = @"No more items!";
+        //cell.textLabel.text = [item description];
+        cell.nameLabel.text = item.itemName;
+        cell.serialNumberLabel.text = item.serialNumber;
+        cell.valueLabel.text = [NSString stringWithFormat:@"$%d", item.valueInDollars];
+        if (item.valueInDollars > 50) {
+            cell.valueLabel.textColor = [UIColor redColor];
+        } else {
+            cell.valueLabel.textColor = [UIColor greenColor];
+        }
+        cell.thumbnailView.image = item.thumbnail;
+        
+        __weak BNRItemCell *weakCell = cell;
+        
+        cell.actionBlock = ^{
+            NSLog(@"Going to show image for %@", item);
+            BNRItemCell *strongCell = weakCell;
+            if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+                NSString *itemKey = item.itemKey;
+                UIImage *img = [[BNRImageStore sharedStore] imageForKey:itemKey];
+                if (!img) return;
+                
+                CGRect rect = [self.view convertRect:strongCell.thumbnailView.bounds
+                                            fromView:strongCell.thumbnailView];
+                
+                BNRImageViewController *ivc = [[BNRImageViewController alloc] init];
+                ivc.image = img;
+                self.imagePopover = [[UIPopoverController alloc] initWithContentViewController:ivc];
+                self.imagePopover.delegate = self;
+                self.imagePopover.popoverContentSize = CGSizeMake(600, 600);
+                [self.imagePopover presentPopoverFromRect:rect
+                                                   inView:self.view
+                                 permittedArrowDirections:UIPopoverArrowDirectionAny
+                                                 animated:YES];
+            }
+        };
     }
     
     cell.showsReorderControl = YES;
     
     return cell;
+}
+
+#pragma mark - 关闭弹出视图
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+    NSLog(@"DidDismissPopover");
+    self.imagePopover = nil;
 }
 
 

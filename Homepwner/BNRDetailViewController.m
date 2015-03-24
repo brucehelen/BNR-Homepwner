@@ -223,10 +223,13 @@
     [[BNRImageStore sharedStore] deleteImageForKey:self.item.itemKey];
 }
 
-// 选中图片，显示在UIImageView上
+#pragma mark - 选中图片，显示在UIImageView上
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     UIImage *image = info[UIImagePickerControllerOriginalImage];
+    // 取得缩略图
+    [self.item setThumbnailFromImage:image];
+    
     self.imageView.image = image;
     [[BNRImageStore sharedStore] setImage:image forKey:self.item.itemKey];
     
